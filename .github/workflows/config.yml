@@ -3,7 +3,7 @@ name: UI Tests
 on:
   push:
     branches:
-      - main  # Или используйте другую ветку, по которой будет запускаться workflow
+      - main  # или другая ветка, по которой нужно запускать workflow
 
 jobs:
   test:
@@ -15,8 +15,22 @@ jobs:
 
     - name: Set up Docker and docker-compose
       run: |
+        # Удаление старых версий Docker и containerd (если есть)
+        sudo apt-get remove -y containerd docker docker-engine docker.io
+        
+        # Обновление репозиториев
         sudo apt-get update
-        sudo apt-get install -y docker.io
+        
+        # Установка зависимостей
+        sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+        
+        # Добавление официального репозитория Docker
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        
+        # Установка Docker и docker-compose
+        sudo apt-get update
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
         sudo apt-get install -y docker-compose  # Устанавливаем docker-compose
 
     - name: Run UI-tests via docker-compose
