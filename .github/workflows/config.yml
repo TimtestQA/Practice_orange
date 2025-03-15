@@ -1,59 +1,71 @@
 name: UI Tests
 
-on: workflow_dispatch  # Триггер: запуск вручную
+on: workflow_dispatch
 
 jobs:
   test:
-    runs-on: ubuntu-latest  # Используем последнюю версию Ubuntu
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository  # Клонирование кода репозитория
+    - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Download Allure history from gh-pages (if exists)
-      run: |
-        git fetch origin gh-pages --depth=1  # Загружаем только последний коммит gh-pages
-        git checkout gh-pages -- allure-report/history || mkdir -p allure-results/history  # Если history есть, берем его, иначе создаем пустую папку
-    - name: Debug Allure history  # Проверяем, существует ли папка history
-      run: ls -lah allure-results/history || echo "No history found"
+    - name: Try to Restore Allure history (if exists)
+      continue-on-error: true
+      uses: actions/download-artifact@v4
+      with:
+        name: allure-history
+        path: allure-results/history
 
-    - name: Run UI-tests via Docker Compose  # Запуск тестов через Docker Compose
+    - name: Ensure Allure history directory exists
+      run: mkdir -p allure-results/history
+
+    - name: Run UI-tests via Docker Compose
       run: docker compose up --build --exit-code-from regression
 
-    - name: Copy Allure history to results
-      run: |
-        mkdir -p allure-results/history  # Создаем папку для истории, если её нет
-        cp -r allure-report/history allure-results/ || true  # Копируем историю в allure-results
     - name: Generate Allure report with history
       run: |
-        docker compose run regression /bin/sh -c "allure generate allure-results --clean -o allure-report"  # Генерация отчета с учетом истории
-    - name: Upload Allure Report  # Загружаем сгенерированный отчет как артефакт
+        cp -r allure-results/history allure-report/ || true
+        docker compose run regression /bin/sh -c "allure generate allure-results --clean -o allure-report"
+
+    - name: Upload Allure Report
       uses: actions/upload-artifact@v4
       with:
         name: allure-report
         path: allure-report
 
-  deploy:
-    name: Deploy to GitHub Pages  # Деплой отчета на GitHub Pages
-    needs: test  # Выполняется только после успешного тестирования
-    runs-on: ubuntu-latest
+    - name: Upload Allure history
+      uses: actions/upload-artifact@v4
+      with:
+        name: allure-history
+        path: allure-report/history
 
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: test
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository  # Клонируем репозиторий
+    - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Download Allure Report  # Загружаем артефакт с отчетом
+    - name: Download Allure Report
       uses: actions/download-artifact@v4
       with:
         name: allure-report
         path: allure-report
 
-    - name: Copy history from previous reports
-      run: |
-        git fetch origin gh-pages --depth=1  # Загружаем последний коммит gh-pages
-        git checkout gh-pages -- allure-report/history || mkdir -p allure-report/history  # Если history есть, копируем, иначе создаем пустую папку
-    - name: Deploy to GitHub Pages  # Публикуем отчет на GitHub Pages
+    - name: Try to Download Allure history (if exists)
+      continue-on-error: true
+      uses: actions/download-artifact@v4
+      with:
+        name: allure-history
+        path: allure-report/history
+
+    - name: Ensure Allure history directory exists
+      run: mkdir -p allure-report/history
+
+    - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
       with:
-        github_token: ${{ secrets.CI_TOKEN }}  # Используем секретный токен для пуша в gh-pages
-        publish_dir: allure-report  # Папка с отчетом
+        github_token: ${{ secrets.CI_TOKEN }}
+        publish_dir: allure-report
