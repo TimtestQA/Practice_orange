@@ -11,7 +11,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Run UI-tests via Docker Compose
       run: docker compose up --build --exit-code-from regression
@@ -20,15 +20,28 @@ jobs:
       run: |
         docker compose run regression /bin/sh -c "mkdir -p allure-results && allure generate allure-results --clean -o allure-report"
 
+    - name: Upload Allure Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: allure-report
+        path: allure-report
+
   deploy:
     name: Deploy to GitHub Pages
     needs: test
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+
+    - name: Download Allure Report
+      uses: actions/download-artifact@v4
+      with:
+        name: allure-report
+        path: allure-report
 
     - name: Deploy to GitHub Pages
-      uses: ./.github/workflows/deploy.yml
+      uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: allure-report
