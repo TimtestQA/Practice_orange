@@ -3,7 +3,7 @@ name: UI Tests
 on:
   push:
     branches:
-      - main  # или другая ветка, по которой нужно запускать
+      - main
 
 jobs:
   test:
@@ -13,31 +13,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up Docker and docker-compose
-      run: |
-        # Удаление старых версий Docker и containerd (если есть)
-        sudo apt-get remove -y containerd docker docker-engine docker.io
-        
-        # Обновление репозиториев
-        sudo apt-get update
-        
-        # Установка зависимостей
-        sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-        
-        # Добавление официального репозитория Docker
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-        
-        # Установка Docker и docker-compose
-        sudo apt-get update
-        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-        sudo apt-get install -y docker-compose  # Устанавливаем docker-compose
-
-    - name: Run UI-tests via docker-compose
-      run: docker-compose up --exit-code-from regression
+    - name: Run UI-tests via Docker Compose
+      run: docker compose up --build --exit-code-from regression
 
     - name: Generate Allure report
-      run: sudo docker-compose run regression allure /bin/sh -c "allure generate allure-results --clean -o allure-report"
+      run: |
+        docker compose run regression /bin/sh -c "mkdir -p allure-results && allure generate allure-results --clean -o allure-report"
 
   deploy:
     name: Deploy to GitHub Pages
