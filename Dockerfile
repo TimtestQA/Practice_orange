@@ -1,8 +1,22 @@
-# Используем Python 3.11 (стабильный) на базе Alpine 3.17
 FROM python:3.11-alpine3.17
 
-# Обновляем apk-репозитории
-RUN apk update && apk add --no-cache chromium chromium-chromedriver tzdata gcompat gcc musl-dev python3-dev libffi-dev openssl-dev cargo openjdk11-jre curl tar
+# Обновляем apk-репозитории и устанавливаем нужные зависимости
+RUN apk update && apk add --no-cache \
+    chromium \
+    chromium-chromedriver \
+    tzdata \
+    gcompat \
+    gcc \
+    musl-dev \
+    python3-dev \
+    libffi-dev \
+    openssl-dev \
+    cargo \
+    unixodbc \
+    unixodbc-dev \
+    openjdk11-jre \
+    curl \
+    tar
 
 # Устанавливаем Allure
 RUN curl -o allure-2.13.8.tgz -Ls https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.13.8/allure-commandline-2.13.8.tgz && \
