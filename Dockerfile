@@ -1,19 +1,8 @@
-# Используем Python 3.12 на базе Alpine 3.17
-FROM python:3.12.0a4-alpine3.17
+# Используем Python 3.11 (стабильный) на базе Alpine 3.17
+FROM python:3.11-alpine3.17
 
 # Обновляем apk-репозитории
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.17/main" >> /etc/apk/repositories && \
-    echo "http://dl-cdn.alpinelinux.org/alpine/v3.17/community" >> /etc/apk/repositories && \
-    apk update
-
-# Устанавливаем нужные пакеты: Chromium, Chromedriver, tzdata, gcompat (glibc)
-RUN apk add --no-cache chromium chromium-chromedriver tzdata gcompat
-
-# Устанавливаем зависимости для сборки Python-пакетов
-RUN apk add --no-cache gcc musl-dev python3-dev libffi-dev openssl-dev cargo
-
-# Устанавливаем OpenJDK 11, curl и tar
-RUN apk add --no-cache openjdk11-jre curl tar
+RUN apk update && apk add --no-cache chromium chromium-chromedriver tzdata gcompat gcc musl-dev python3-dev libffi-dev openssl-dev cargo openjdk11-jre curl tar
 
 # Устанавливаем Allure
 RUN curl -o allure-2.13.8.tgz -Ls https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.13.8/allure-commandline-2.13.8.tgz && \
@@ -28,5 +17,6 @@ WORKDIR /usr/workspace
 COPY ./requirements.txt /usr/workspace/requirements.txt
 
 # Обновляем pip и устанавливаем зависимости
-RUN pip install --upgrade pip setuptools wheel && \
+RUN python3 -m ensurepip --upgrade && \
+    python3 -m pip install --upgrade "pip<24" setuptools wheel && \
     pip install --no-cache-dir -r requirements.txt
