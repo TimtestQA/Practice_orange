@@ -1,21 +1,36 @@
 {
-  "uid" : "ecd65badee45b761",
+  "uid" : "27bb5c48749c98af",
   "name" : "test_login",
   "fullName" : "tests.test_login.TestLogin#test_login",
   "historyId" : "2116f0ad00ab1de0effc54f114dd9496",
   "time" : {
-    "start" : 1742082455879,
-    "stop" : 1742082460665,
-    "duration" : 4786
+    "start" : 1742082988498,
+    "stop" : 1742082993273,
+    "duration" : 4775
   },
   "status" : "passed",
   "flaky" : false,
   "newFailed" : false,
   "beforeStages" : [ {
+    "name" : "driver",
+    "time" : {
+      "start" : 1742082988229,
+      "stop" : 1742082988497,
+      "duration" : 268
+    },
+    "status" : "passed",
+    "steps" : [ ],
+    "attachments" : [ ],
+    "parameters" : [ ],
+    "attachmentsCount" : 0,
+    "shouldDisplayMessage" : false,
+    "hasContent" : false,
+    "stepsCount" : 0
+  }, {
     "name" : "_xunit_setup_method_fixture_TestLogin",
     "time" : {
-      "start" : 1742082455877,
-      "stop" : 1742082455878,
+      "start" : 1742082988497,
+      "stop" : 1742082988498,
       "duration" : 1
     },
     "status" : "passed",
@@ -24,14 +39,14 @@
     "parameters" : [ ],
     "attachmentsCount" : 0,
     "shouldDisplayMessage" : false,
-    "stepsCount" : 0,
-    "hasContent" : false
+    "hasContent" : false,
+    "stepsCount" : 0
   }, {
     "name" : "_session_faker",
     "time" : {
-      "start" : 1742082455533,
-      "stop" : 1742082455602,
-      "duration" : 69
+      "start" : 1742082988163,
+      "stop" : 1742082988229,
+      "duration" : 66
     },
     "status" : "passed",
     "steps" : [ ],
@@ -39,32 +54,17 @@
     "parameters" : [ ],
     "attachmentsCount" : 0,
     "shouldDisplayMessage" : false,
-    "stepsCount" : 0,
-    "hasContent" : false
-  }, {
-    "name" : "driver",
-    "time" : {
-      "start" : 1742082455602,
-      "stop" : 1742082455877,
-      "duration" : 275
-    },
-    "status" : "passed",
-    "steps" : [ ],
-    "attachments" : [ ],
-    "parameters" : [ ],
-    "attachmentsCount" : 0,
-    "shouldDisplayMessage" : false,
-    "stepsCount" : 0,
-    "hasContent" : false
+    "hasContent" : false,
+    "stepsCount" : 0
   } ],
   "testStage" : {
     "status" : "passed",
     "steps" : [ {
       "name" : "Ввод логина",
       "time" : {
-        "start" : 1742082456519,
-        "stop" : 1742082457575,
-        "duration" : 1056
+        "start" : 1742082989142,
+        "stop" : 1742082990194,
+        "duration" : 1052
       },
       "status" : "passed",
       "steps" : [ ],
@@ -75,14 +75,14 @@
       } ],
       "attachmentsCount" : 0,
       "shouldDisplayMessage" : false,
-      "stepsCount" : 0,
-      "hasContent" : true
+      "hasContent" : true,
+      "stepsCount" : 0
     }, {
       "name" : "Ввод пароля",
       "time" : {
-        "start" : 1742082457575,
-        "stop" : 1742082457614,
-        "duration" : 39
+        "start" : 1742082990194,
+        "stop" : 1742082990228,
+        "duration" : 34
       },
       "status" : "passed",
       "steps" : [ ],
@@ -93,14 +93,14 @@
       } ],
       "attachmentsCount" : 0,
       "shouldDisplayMessage" : false,
-      "stepsCount" : 0,
-      "hasContent" : true
+      "hasContent" : true,
+      "stepsCount" : 0
     }, {
       "name" : "Нажать войти",
       "time" : {
-        "start" : 1742082457614,
-        "stop" : 1742082457664,
-        "duration" : 50
+        "start" : 1742082990228,
+        "stop" : 1742082990273,
+        "duration" : 45
       },
       "status" : "passed",
       "steps" : [ ],
@@ -108,36 +108,21 @@
       "parameters" : [ ],
       "attachmentsCount" : 0,
       "shouldDisplayMessage" : false,
-      "stepsCount" : 0,
-      "hasContent" : false
+      "hasContent" : false,
+      "stepsCount" : 0
     } ],
     "attachments" : [ ],
     "parameters" : [ ],
     "attachmentsCount" : 0,
     "shouldDisplayMessage" : false,
-    "stepsCount" : 3,
-    "hasContent" : true
+    "hasContent" : true,
+    "stepsCount" : 3
   },
   "afterStages" : [ {
-    "name" : "_xunit_setup_method_fixture_TestLogin::0",
-    "time" : {
-      "start" : 1742082460665,
-      "stop" : 1742082460665,
-      "duration" : 0
-    },
-    "status" : "passed",
-    "steps" : [ ],
-    "attachments" : [ ],
-    "parameters" : [ ],
-    "attachmentsCount" : 0,
-    "shouldDisplayMessage" : false,
-    "stepsCount" : 0,
-    "hasContent" : false
-  }, {
     "name" : "driver::0",
     "time" : {
-      "start" : 1742082460666,
-      "stop" : 1742082460722,
+      "start" : 1742082993274,
+      "stop" : 1742082993330,
       "duration" : 56
     },
     "status" : "passed",
@@ -146,8 +131,23 @@
     "parameters" : [ ],
     "attachmentsCount" : 0,
     "shouldDisplayMessage" : false,
-    "stepsCount" : 0,
-    "hasContent" : false
+    "hasContent" : false,
+    "stepsCount" : 0
+  }, {
+    "name" : "_xunit_setup_method_fixture_TestLogin::0",
+    "time" : {
+      "start" : 1742082993274,
+      "stop" : 1742082993274,
+      "duration" : 0
+    },
+    "status" : "passed",
+    "steps" : [ ],
+    "attachments" : [ ],
+    "parameters" : [ ],
+    "attachmentsCount" : 0,
+    "shouldDisplayMessage" : false,
+    "hasContent" : false,
+    "stepsCount" : 0
   } ],
   "labels" : [ {
     "name" : "tag",
@@ -163,7 +163,7 @@
     "value" : "TestLogin"
   }, {
     "name" : "host",
-    "value" : "989b18451cf1"
+    "value" : "da9cb17b138b"
   }, {
     "name" : "thread",
     "value" : "1-MainThread"
@@ -190,6 +190,6 @@
     "categories" : [ ],
     "tags" : [ "smoke" ]
   },
-  "source" : "ecd65badee45b761.json",
+  "source" : "27bb5c48749c98af.json",
   "parameterValues" : [ ]
 }
