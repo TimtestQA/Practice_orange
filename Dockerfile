@@ -7,7 +7,7 @@ RUN apk update && apk add --no-cache \
     libnss \
     freetype \
     harfbuzz \
-    ttf-freefont \   # <- ДОБАВИЛИ ОБРАТНУЮ КОСУЮ ЧЕРТУ `\`
+    ttf-freefont \
     tzdata \
     gcompat \
     gcc \
