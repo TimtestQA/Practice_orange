@@ -4,7 +4,7 @@ FROM python:3.11-alpine3.17
 RUN apk update && apk add --no-cache \
     chromium \
     chromium-chromedriver \
-    libnss \
+    nss \
     freetype \
     harfbuzz \
     ttf-freefont \
