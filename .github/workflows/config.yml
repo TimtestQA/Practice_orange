@@ -12,6 +12,8 @@ jobs:
 
     - name: Fetch Allure history from gh-pages
       run: |
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
         git fetch origin gh-pages --depth=1 || echo "No gh-pages branch yet"
         mkdir -p allure-results/history
         git checkout gh-pages -- allure-report/history || echo "No history folder found in gh-pages"
