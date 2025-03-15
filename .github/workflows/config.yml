@@ -10,19 +10,22 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Restore Allure history
+    - name: Try to Restore Allure history (if exists)
+      continue-on-error: true
       uses: actions/download-artifact@v4
       with:
         name: allure-history
         path: allure-results/history
+
+    - name: Ensure Allure history directory exists
+      run: mkdir -p allure-results/history
 
     - name: Run UI-tests via Docker Compose
       run: docker compose up --build --exit-code-from regression
 
     - name: Generate Allure report with history
       run: |
-        mkdir -p allure-results/history
-        cp -r allure-report/history allure-results/
+        cp -r allure-results/history allure-report/ || true
         docker compose run regression /bin/sh -c "allure generate allure-results --clean -o allure-report"
 
     - name: Upload Allure Report
@@ -51,11 +54,15 @@ jobs:
         name: allure-report
         path: allure-report
 
-    - name: Download Allure history
+    - name: Try to Download Allure history (if exists)
+      continue-on-error: true
       uses: actions/download-artifact@v4
       with:
         name: allure-history
         path: allure-report/history
+
+    - name: Ensure Allure history directory exists
+      run: mkdir -p allure-report/history
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
