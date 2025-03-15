@@ -1,47 +1,67 @@
 name: UI Tests
 
- on:
-   push:
-     branches:
-       - main
- on: workflow_dispatch
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
- jobs:
-   test:
-     runs-on: ubuntu-latest
+jobs:
+  test:
+    runs-on: ubuntu-latest
 
-     steps:
-     - name: Checkout repository
-       uses: actions/checkout@v4
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-     - name: Run UI-tests via Docker Compose
-       run: docker compose up --build --exit-code-from regression
+    - name: Checkout (copy) gh-pages repository
+      run: |
+        git clone --depth=1 --branch=gh-pages https://github.com/${{ github.repository }}.git gh-pages || echo "No gh-pages branch yet"
+        mkdir -p allure-results/history
+        cp -r gh-pages/allure-report/history/* allure-results/history/ || echo "No previous history found"
+        ls -la allure-results/history || echo "History not copied correctly"
 
-     - name: Generate Allure report
-       run: |
-         docker compose run regression /bin/sh -c "mkdir -p allure-results && allure generate allure-results --clean -o allure-report"
+    - name: Run UI-tests via Docker Compose
+      run: docker compose up --build --exit-code-from regression
 
-     - name: Upload Allure Report
-       uses: actions/upload-artifact@v4
-       with:
-         name: allure-report
-         path: allure-report
+    - name: Generate Allure report with history
+      run: |
+        docker compose run regression /bin/sh -c "allure generate allure-results -o allure-report"
 
-   deploy:
-     name: Deploy to GitHub Pages
-     needs: test
-     runs-on: ubuntu-latest
-     steps:
-     - name: Checkout repository
-       uses: actions/checkout@v4
+    - name: Upload Allure Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: allure-report
+        path: allure-report
 
-     - name: Download Allure Report
-       uses: actions/download-artifact@v4
-       with:
-         name: allure-report
-         path: allure-report
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-     - name: Deploy to GitHub Pages
-       uses: peaceiris/actions-gh-pages@v4
-       with:
-         github_token: ${{ secrets.CI_TOKEN }}
+    - name: Download Allure Report
+      uses: actions/download-artifact@v4
+      with:
+        name: allure-report
+        path: allure-report
+
+    - name: Ensure history is in gh-pages
+      run: |
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git clone --depth=1 --branch=gh-pages https://github.com/${{ github.repository }}.git gh-pages || echo "No gh-pages branch yet"
+        mkdir -p allure-report/history
+        cp -r allure-results/history allure-report/history || echo "No history to copy"
+        cd gh-pages
+        git add allure-report/history
+        git commit -m "Save Allure history" || echo "No changes to commit"
+        git push origin gh-pages
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.CI_TOKEN }}
+        publish_dir: allure-report
