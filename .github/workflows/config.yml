@@ -3,7 +3,7 @@ name: UI Tests
 on:
   push:
     branches:
-      - main  # или другая ветка, по которой нужно запускать workflow
+      - main  # или другая ветка, по которой нужно запускать
 
 jobs:
   test:
