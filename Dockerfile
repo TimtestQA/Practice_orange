@@ -7,6 +7,8 @@ RUN apk update && apk add --no-cache \
     tzdata \
     gcompat \
     gcc \
+    g++ \
+    make \
     musl-dev \
     python3-dev \
     libffi-dev \
