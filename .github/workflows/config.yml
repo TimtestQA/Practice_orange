@@ -3,7 +3,7 @@ name: UI Tests
 on:
   push:
     branches:
-      - main  # или любой другой ветки, по которой будет запускаться процесс
+      - main  # Или используйте другую ветку, по которой будет запускаться workflow
 
 jobs:
   test:
@@ -13,6 +13,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Set up Docker and docker-compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker.io
+        sudo apt-get install -y docker-compose  # Устанавливаем docker-compose
+
     - name: Run UI-tests via docker-compose
       run: docker-compose up --exit-code-from regression
 
@@ -21,13 +27,13 @@ jobs:
 
   deploy:
     name: Deploy to GitHub Pages
-    needs: test  # Указывает, что этот шаг выполняется после тестов
+    needs: test
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
     - name: Deploy to GitHub Pages
-      uses: ./.github/workflows/deploy.yml  # Ссылка на ваш workflow для деплоя
+      uses: ./.github/workflows/deploy.yml
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
