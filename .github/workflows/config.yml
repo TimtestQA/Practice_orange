@@ -10,22 +10,17 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Try to Restore Allure history (if exists)
-      continue-on-error: true
-      uses: actions/download-artifact@v4
-      with:
-        name: allure-history
-        path: allure-results/history
-
-    - name: Ensure Allure history directory exists
-      run: mkdir -p allure-results/history
+    - name: Download Allure history from gh-pages (if exists)
+      run: |
+        git fetch origin gh-pages --depth=1
+        git checkout gh-pages -- allure-history || mkdir -p allure-results/history
 
     - name: Run UI-tests via Docker Compose
       run: docker compose up --build --exit-code-from regression
 
     - name: Generate Allure report with history
       run: |
-        cp -r allure-results/history allure-report/ || true
+        cp -r allure-results/history allure-report/history || true
         docker compose run regression /bin/sh -c "allure generate allure-results --clean -o allure-report"
 
     - name: Upload Allure Report
@@ -33,12 +28,6 @@ jobs:
       with:
         name: allure-report
         path: allure-report
-
-    - name: Upload Allure history
-      uses: actions/upload-artifact@v4
-      with:
-        name: allure-history
-        path: allure-report/history
 
   deploy:
     name: Deploy to GitHub Pages
@@ -54,15 +43,10 @@ jobs:
         name: allure-report
         path: allure-report
 
-    - name: Try to Download Allure history (if exists)
-      continue-on-error: true
-      uses: actions/download-artifact@v4
-      with:
-        name: allure-history
-        path: allure-report/history
-
-    - name: Ensure Allure history directory exists
-      run: mkdir -p allure-report/history
+    - name: Copy history from previous reports
+      run: |
+        git fetch origin gh-pages --depth=1
+        git checkout gh-pages -- allure-report/history || mkdir -p allure-report/history
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
