@@ -9,6 +9,9 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.17/main" >> /etc/apk/repositor
 # Устанавливаем нужные пакеты: Chromium, Chromedriver, tzdata, gcompat (glibc)
 RUN apk add --no-cache chromium chromium-chromedriver tzdata gcompat
 
+# Устанавливаем зависимости для сборки Python-пакетов
+RUN apk add --no-cache gcc musl-dev python3-dev libffi-dev openssl-dev cargo
+
 # Устанавливаем OpenJDK 11, curl и tar
 RUN apk add --no-cache openjdk11-jre curl tar
 
@@ -24,5 +27,6 @@ WORKDIR /usr/workspace
 # Копируем файлы проекта
 COPY ./requirements.txt /usr/workspace/requirements.txt
 
-# Устанавливаем зависимости Python
-RUN pip install --no-cache-dir -r requirements.txt
+# Обновляем pip и устанавливаем зависимости
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r requirements.txt
