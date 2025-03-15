@@ -2,65 +2,42 @@ name: UI Tests
 
 on: workflow_dispatch
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
+ jobs:
+   test:
+     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+     steps:
+     - name: Checkout repository
+       uses: actions/checkout@v4
 
-    - name: Fetch Allure history from gh-pages
-      run: |
-        git fetch origin gh-pages --depth=1 || echo "No gh-pages branch yet"
-        mkdir -p allure-results/history
-        if git ls-tree -d origin/gh-pages allure-report/history; then
-          git checkout origin/gh-pages -- allure-report/history || echo "No history folder found in gh-pages"
-          rsync -av allure-report/history/ allure-results/history/ || echo "No previous history found"
-        fi
-        ls -la allure-results/history || echo "History not copied correctly"
+     - name: Run UI-tests via Docker Compose
+       run: docker compose up --build --exit-code-from regression
 
-    - name: Run UI-tests via Docker Compose
-      run: docker compose up --build --exit-code-from regression
+     - name: Generate Allure report
+       run: |
+         docker compose run regression /bin/sh -c "mkdir -p allure-results && allure generate allure-results --clean -o allure-report"
 
-    - name: Generate Allure report
-      run: |
-        docker compose run regression /bin/sh -c "mkdir -p allure-results && allure generate allure-results --clean -o allure-report"
+     - name: Upload Allure Report
+       uses: actions/upload-artifact@v4
+       with:
+         name: allure-report
+         path: allure-report
 
-    - name: Upload Allure Report
-      uses: actions/upload-artifact@v4
-      with:
-        name: allure-report
-        path: allure-report
+   deploy:
+     name: Deploy to GitHub Pages
+     needs: test
+     runs-on: ubuntu-latest
+     steps:
+     - name: Checkout repository
+       uses: actions/checkout@v4
 
-  deploy:
-    name: Deploy to GitHub Pages
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+     - name: Download Allure Report
+       uses: actions/download-artifact@v4
+       with:
+         name: allure-report
+         path: allure-report
 
-    - name: Download Allure Report
-      uses: actions/download-artifact@v4
-      with:
-        name: allure-report
-        path: allure-report
-
-    - name: Ensure history is in gh-pages
-      run: |
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "github-actions[bot]"
-        git fetch origin gh-pages --depth=1 || echo "No gh-pages branch yet"
-        mkdir -p allure-report/history
-        rsync -av allure-results/history/ allure-report/history/ || echo "No history to copy"
-        git checkout gh-pages || git checkout -b gh-pages
-        git add allure-report/history
-        git commit -m "Save Allure history" || echo "No changes to commit"
-        git push origin gh-pages
-
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.CI_TOKEN }}
-        publish_dir: allure-report
+     - name: Deploy to GitHub Pages
+       uses: peaceiris/actions-gh-pages@v4
+       with:
+         github_token: ${{ secrets.CI_TOKEN }}
