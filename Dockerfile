@@ -4,6 +4,10 @@ FROM python:3.11-alpine3.17
 RUN apk update && apk add --no-cache \
     chromium \
     chromium-chromedriver \
+    libnss \
+    freetype \
+    harfbuzz \
+    ttf-freefont
     tzdata \
     gcompat \
     gcc \
