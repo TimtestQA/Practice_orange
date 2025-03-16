@@ -10,23 +10,27 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Try to Restore Allure history (if exists)
-      continue-on-error: true
-      uses: actions/download-artifact@v4
-      with:
-        name: allure-history
-        path: allure-results/history
-
-    - name: Ensure Allure history directory exists
-      run: mkdir -p allure-results/history
+    - name: Fetch Allure history from gh-pages
+      run: |
+        git fetch origin gh-pages --depth=1 || echo "No gh-pages branch yet"
+        mkdir -p allure-results/history
+        git checkout gh-pages -- allure-report/history || echo "No history folder found in gh-pages"
+        cp -r allure-report/history/* allure-results/history/ || echo "No previous history found"
+        ls -la allure-results/history || echo "History not copied correctly"
 
     - name: Run UI-tests via Docker Compose
       run: docker compose up --build --exit-code-from regression
 
-    - name: Generate Allure report with history
+    - name: Copy history before generating report
       run: |
-        cp -r allure-results/history allure-report/ || true
-        docker compose run regression /bin/sh -c "allure generate allure-results --clean -o allure-report"
+        mkdir -p allure-report/history
+        cp -r allure-results/history/* allure-report/history/ || echo "No history to copy"
+
+    - name: Generate Allure report with history
+      run: docker compose run regression /bin/sh -c "allure generate allure-results --clean -o allure-report"
+
+    - name: Debug generated history files
+      run: ls -la allure-report/history || echo "No history in generated report"
 
     - name: Upload Allure Report
       uses: actions/upload-artifact@v4
@@ -44,6 +48,7 @@ jobs:
     name: Deploy to GitHub Pages
     needs: test
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -60,6 +65,9 @@ jobs:
       with:
         name: allure-history
         path: allure-report/history
+
+    - name: Debug downloaded history files
+      run: ls -la allure-report/history || echo "No history files downloaded"
 
     - name: Ensure Allure history directory exists
       run: mkdir -p allure-report/history
