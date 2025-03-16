@@ -11,49 +11,41 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Шаг 2: Клонируем ветку gh-pages для истории
+      # Шаг 2: Клонируем ветку gh-pages для подгрузки истории
       - name: Checkout gh-pages branch for history
         uses: actions/checkout@v4
         with:
           ref: gh-pages
           path: gh-pages
 
-      # Шаг 3: Проверяем, что директория с историей существует в gh-pages
-      - name: Check gh-pages/history before copying
-        run: ls -la gh-pages/history || echo "No history folder found"
-
-      # Шаг 4: Копируем историю из gh-pages в рабочую директорию
+      # Шаг 3: Копируем историю с gh-pages в рабочую директорию
       - name: Restore Allure history from gh-pages
         run: |
           mkdir -p allure-results/history
           cp -r gh-pages/history allure-results/ || true
 
-      # Шаг 5: Запускаем UI тесты через Docker Compose
+      # Шаг 4: Запуск UI тестов через Docker Compose
       - name: Run UI-tests via Docker Compose
         run: docker compose up --build --exit-code-from regression
 
-      # Шаг 6: Проверяем, что история подгружена правильно
-      - name: Debug: Check history before generating report
-        run: ls -la allure-results/history || echo "No history folder in allure-results"
-
-      # Шаг 7: Копируем обновлённую историю в отчёт
+      # Шаг 5: Копируем обновленную историю в папку для отчета
       - name: Copy updated history to report
         run: |
           mkdir -p allure-report/history
-          cp -R allure-results/history/* allure-report/
+          cp -r allure-results/history allure-report/ || true
 
-      # Шаг 8: Генерируем отчёт Allure с учётом истории
+      # Шаг 6: Генерируем Allure отчет с историей
       - name: Generate Allure report with history
         run: docker compose run regression /bin/sh -c "allure generate allure-results --clean -o allure-report"
 
-      # Шаг 9: Загружаем отчёт Allure
+      # Шаг 7: Загружаем отчет Allure как артефакт
       - name: Upload Allure Report
         uses: actions/upload-artifact@v4
         with:
           name: allure-report
           path: allure-report
 
-      # Шаг 10: Загружаем историю Allure
+      # Шаг 8: Загружаем историю Allure как артефакт
       - name: Upload Allure history
         uses: actions/upload-artifact@v4
         with:
@@ -66,25 +58,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Шаг 1: Клонируем основной репозиторий для деплоя
+      # Шаг 9: Клонируем основной репозиторий
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Шаг 2: Скачиваем отчёт Allure
+      # Шаг 10: Загружаем Allure отчет
       - name: Download Allure Report
         uses: actions/download-artifact@v4
         with:
           name: allure-report
           path: allure-report
 
-      # Шаг 3: Скачиваем историю Allure
+      # Шаг 11: Загружаем историю Allure
       - name: Download Allure history
         uses: actions/download-artifact@v4
         with:
           name: allure-history
           path: allure-report/history
 
-      # Шаг 4: Деплоим отчёт на GitHub Pages
+      # Шаг 12: Деплой отчета на GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
