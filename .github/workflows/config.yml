@@ -10,19 +10,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Checkout gh-pages branch
+      - name: Checkout (copy) gh-pages repository
         uses: actions/checkout@v4
         with:
           ref: gh-pages
-          path: gh-pages
+          path: ./.gh-pages
 
-      - name: Restore Allure history from gh-pages
+      - name: Clone gh-pages branch for history
         run: |
           mkdir -p allure-results/history
-          cp -r gh-pages/Practice_orange/history allure-results/ || true
-
-      - name: Debug: Check restored history
-        run: ls -la allure-results/history || true
+          cp -r ./.gh-pages/Practice_orange/history allure-results/ || true
 
       - name: Run UI-tests via Docker Compose
         run: docker compose up --build --exit-code-from regression
@@ -30,16 +27,10 @@ jobs:
       - name: Copy updated history to report
         run: |
           mkdir -p allure-report/history
-          cp -r allure-results/history/* allure-report/history/ || true
-
-      - name: Debug: Check report history before generation
-        run: ls -la allure-report/history || true
+          cp -R allure-results/history/* allure-report/
 
       - name: Generate Allure report with history
         run: docker compose run regression /bin/sh -c "allure generate allure-results --clean -o allure-report"
-
-      - name: Debug: Check report history after generation
-        run: ls -la allure-report/history || true
 
       - name: Upload Allure Report
         uses: actions/upload-artifact@v4
