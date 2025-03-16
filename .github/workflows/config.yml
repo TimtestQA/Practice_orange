@@ -10,37 +10,39 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # Восстанавливаем историю Allure из ветки gh-pages
+    # 1. Извлекаем историю из gh-pages, если она есть
     - name: Restore Allure history from gh-pages
       run: |
         git fetch origin gh-pages --depth=1 || echo "No gh-pages branch yet"
         mkdir -p allure-results/history
         git checkout gh-pages -- allure-report/history || echo "No history folder found in gh-pages"
-        cp -R allure-report/history/* allure-results/history/ || echo "No previous history found"
+        if [ -d allure-report/history ]; then
+          cp -R allure-report/history/* allure-results/history/
+        else
+          echo "No previous history found"
+        fi
 
-    # Убеждаемся, что папка истории существует
     - name: Ensure Allure history directory exists
       run: mkdir -p allure-results/history
 
-    # Запускаем UI-тесты через Docker Compose
+    # 2. Запускаем UI-тесты
     - name: Run UI-tests via Docker Compose
       run: docker compose up --build --exit-code-from regression
 
-    # Генерируем отчет Allure с историей
+    # 3. Генерируем отчёт с историей
     - name: Generate Allure report with history
       run: |
-        mkdir -p allure-report/history
-        cp -R allure-results/history/* allure-report/history/ || echo "No history to copy"
+        cp -R allure-results/history allure-report/ || true
         docker compose run regression /bin/sh -c "allure generate allure-results --clean -o allure-report"
 
-    # Загружаем отчет Allure как артефакт
+    # 4. Загружаем Allure отчет как артефакт
     - name: Upload Allure Report
       uses: actions/upload-artifact@v4
       with:
         name: allure-report
         path: allure-report
 
-    # Загружаем историю Allure как артефакт
+    # 5. Загружаем Allure history как артефакт
     - name: Upload Allure history
       uses: actions/upload-artifact@v4
       with:
@@ -55,14 +57,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # Загружаем отчет Allure
+    # 6. Загружаем Allure отчёт из артефактов
     - name: Download Allure Report
       uses: actions/download-artifact@v4
       with:
         name: allure-report
         path: allure-report
 
-    # Загружаем историю Allure (если есть)
+    # 7. Загружаем Allure history из артефактов (если есть)
     - name: Try to Download Allure history (if exists)
       continue-on-error: true
       uses: actions/download-artifact@v4
@@ -70,23 +72,10 @@ jobs:
         name: allure-history
         path: allure-report/history
 
-    # Убеждаемся, что папка истории существует
     - name: Ensure Allure history directory exists
       run: mkdir -p allure-report/history
 
-    # Сохраняем историю в gh-pages для будущих запусков
-    - name: Commit and Push Allure history to gh-pages
-      run: |
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "github-actions[bot]"
-        git checkout gh-pages || git checkout -b gh-pages
-        mkdir -p allure-report/history
-        cp -R allure-report/history allure-report/ || echo "No history to copy"
-        git add allure-report/history || echo "Nothing to commit"
-        git commit -m "Update Allure history" || echo "No changes to commit"
-        git push origin gh-pages || echo "Push failed"
-
-    # Деплой отчета Allure на GitHub Pages
+    # 8. Публикуем отчет в GitHub Pages
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
       with:
