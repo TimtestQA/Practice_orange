@@ -16,7 +16,7 @@ jobs:
         git fetch origin gh-pages --depth=1 || echo "No gh-pages branch yet"
         mkdir -p allure-results/history
         git checkout gh-pages -- allure-report/history || echo "No history folder found in gh-pages"
-        cp -r allure-report/history/* allure-results/history/ || echo "No previous history found"
+        cp -r allure-report/history allure-results/ || echo "No previous history found"
         ls -la allure-results/history || echo "History not copied correctly"
 
     - name: Run UI-tests via Docker Compose
@@ -24,6 +24,7 @@ jobs:
 
     - name: Generate Allure report with history
       run: |
+        mkdir -p allure-report/history
         cp -r allure-results/history allure-report/ || echo "No history to copy"
         docker compose run regression /bin/sh -c "allure generate allure-results --clean -o allure-report"
 
@@ -62,6 +63,17 @@ jobs:
 
     - name: Ensure Allure history directory exists
       run: mkdir -p allure-report/history
+
+    - name: Commit and Push Allure history to gh-pages
+      run: |
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git checkout gh-pages || git checkout -b gh-pages
+        mkdir -p allure-report/history
+        cp -r allure-report/history allure-report/ || echo "No history to copy"
+        git add allure-report/history || echo "Nothing to commit"
+        git commit -m "Update Allure history" || echo "No changes to commit"
+        git push origin gh-pages || echo "Push failed"
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
