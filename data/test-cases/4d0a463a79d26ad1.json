@@ -1,22 +1,22 @@
 {
-  "uid" : "bca51a98ff91e5be",
+  "uid" : "4d0a463a79d26ad1",
   "name" : "test_login",
   "fullName" : "tests.test_login.TestLogin#test_login",
   "historyId" : "2116f0ad00ab1de0effc54f114dd9496",
   "time" : {
-    "start" : 1742085246310,
-    "stop" : 1742085251029,
-    "duration" : 4719
+    "start" : 1742085563830,
+    "stop" : 1742085568570,
+    "duration" : 4740
   },
   "status" : "passed",
   "flaky" : false,
   "newFailed" : false,
   "beforeStages" : [ {
-    "name" : "_session_faker",
+    "name" : "driver",
     "time" : {
-      "start" : 1742085245970,
-      "stop" : 1742085246036,
-      "duration" : 66
+      "start" : 1742085563529,
+      "stop" : 1742085563828,
+      "duration" : 299
     },
     "status" : "passed",
     "steps" : [ ],
@@ -27,11 +27,11 @@
     "stepsCount" : 0,
     "hasContent" : false
   }, {
-    "name" : "driver",
+    "name" : "_session_faker",
     "time" : {
-      "start" : 1742085246036,
-      "stop" : 1742085246308,
-      "duration" : 272
+      "start" : 1742085563464,
+      "stop" : 1742085563529,
+      "duration" : 65
     },
     "status" : "passed",
     "steps" : [ ],
@@ -44,9 +44,9 @@
   }, {
     "name" : "_xunit_setup_method_fixture_TestLogin",
     "time" : {
-      "start" : 1742085246308,
-      "stop" : 1742085246309,
-      "duration" : 1
+      "start" : 1742085563828,
+      "stop" : 1742085563830,
+      "duration" : 2
     },
     "status" : "passed",
     "steps" : [ ],
@@ -62,8 +62,8 @@
     "steps" : [ {
       "name" : "Ввод логина",
       "time" : {
-        "start" : 1742085246897,
-        "stop" : 1742085247949,
+        "start" : 1742085564441,
+        "stop" : 1742085565493,
         "duration" : 1052
       },
       "status" : "passed",
@@ -80,9 +80,9 @@
     }, {
       "name" : "Ввод пароля",
       "time" : {
-        "start" : 1742085247949,
-        "stop" : 1742085247983,
-        "duration" : 34
+        "start" : 1742085565493,
+        "stop" : 1742085565526,
+        "duration" : 33
       },
       "status" : "passed",
       "steps" : [ ],
@@ -98,9 +98,9 @@
     }, {
       "name" : "Нажать войти",
       "time" : {
-        "start" : 1742085247983,
-        "stop" : 1742085248029,
-        "duration" : 46
+        "start" : 1742085565526,
+        "stop" : 1742085565570,
+        "duration" : 44
       },
       "status" : "passed",
       "steps" : [ ],
@@ -121,8 +121,8 @@
   "afterStages" : [ {
     "name" : "driver::0",
     "time" : {
-      "start" : 1742085251030,
-      "stop" : 1742085251086,
+      "start" : 1742085568571,
+      "stop" : 1742085568627,
       "duration" : 56
     },
     "status" : "passed",
@@ -136,8 +136,8 @@
   }, {
     "name" : "_xunit_setup_method_fixture_TestLogin::0",
     "time" : {
-      "start" : 1742085251030,
-      "stop" : 1742085251030,
+      "start" : 1742085568571,
+      "stop" : 1742085568571,
       "duration" : 0
     },
     "status" : "passed",
@@ -163,7 +163,7 @@
     "value" : "TestLogin"
   }, {
     "name" : "host",
-    "value" : "0781a93eb938"
+    "value" : "9860313488e8"
   }, {
     "name" : "thread",
     "value" : "1-MainThread"
@@ -190,6 +190,6 @@
     "categories" : [ ],
     "tags" : [ "smoke" ]
   },
-  "source" : "bca51a98ff91e5be.json",
+  "source" : "4d0a463a79d26ad1.json",
   "parameterValues" : [ ]
 }
