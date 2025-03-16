@@ -10,16 +10,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Checkout gh-pages for Allure history
-        run: |
-          git fetch origin gh-pages
-          git checkout gh-pages
-
-      - name: Restore Allure history
-        run: |
-          mkdir -p allure-results/history allure-report/history
-          cp history/history.json allure-results/history/ || true
-          cp history/history.json allure-report/history/ || true
+      - name: Download Allure history from gh-pages
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: allure-history
+          path: allure-results/history
 
       - name: Ensure Allure history directory exists
         run: mkdir -p allure-results/history
@@ -29,8 +25,8 @@ jobs:
 
       - name: Generate Allure report with history
         run: |
-          docker compose run regression /bin/sh -c "mkdir -p allure-results && allure generate allure-results --clean -o allure-report"
-          cp -r allure-results/history allure-report/ || true
+          cp -r allure-report/history allure-results/ || true
+          docker compose run regression /bin/sh -c "allure generate allure-results --clean -o allure-report"
 
       - name: Upload Allure Report
         uses: actions/upload-artifact@v4
@@ -53,21 +49,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Checkout gh-pages for Allure history
-        run: |
-          git fetch origin gh-pages
-          git checkout gh-pages
-
       - name: Download Allure Report
         uses: actions/download-artifact@v4
         with:
           name: allure-report
           path: allure-report
 
-      - name: Restore Allure history before deployment
-        run: |
-          mkdir -p allure-report/history
-          cp history/history.json allure-report/history/ || true
+      - name: Download Allure history
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: allure-history
+          path: allure-report/history
+
+      - name: Ensure Allure history directory exists
+        run: mkdir -p allure-report/history
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
