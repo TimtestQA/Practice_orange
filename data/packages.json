@@ -4,13 +4,13 @@
     "name" : "tests.test_login",
     "children" : [ {
       "name" : "test_login",
-      "uid" : "4d0a463a79d26ad1",
+      "uid" : "94295530b778b816",
       "parentUid" : "383153a1e87e9025e9b82f017e857ae3",
       "status" : "passed",
       "time" : {
-        "start" : 1742085563830,
-        "stop" : 1742085568570,
-        "duration" : 4740
+        "start" : 1742085828811,
+        "stop" : 1742085834140,
+        "duration" : 5329
       },
       "flaky" : false,
       "newFailed" : false,
