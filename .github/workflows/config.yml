@@ -7,41 +7,49 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Шаг 1: Клонируем репозиторий
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Шаг 2: Клонируем ветку gh-pages для истории
       - name: Checkout gh-pages branch for history
         uses: actions/checkout@v4
         with:
           ref: gh-pages
           path: gh-pages
 
-      - name: Restore Allure history
+      # Шаг 3: Восстанавливаем Allure history из gh-pages
+      - name: Restore Allure history from gh-pages
         run: |
           mkdir -p allure-results/history
           cp -r gh-pages/Practice_orange/history allure-results/ || true
 
+      # Шаг 4: Запуск UI тестов
       - name: Run UI-tests via Docker Compose
         run: docker compose up --build --exit-code-from regression
 
+      # Шаг 5: Проверяем, что история подгружена
       - name: Debug: Check history before generating report
         run: ls -la allure-results/history
 
+      # Шаг 6: Копируем обновленную историю в отчет
       - name: Copy updated history to report
         run: |
           mkdir -p allure-report/history
           cp -r allure-results/history allure-report/ || true
 
+      # Шаг 7: Генерируем Allure отчет с историей
       - name: Generate Allure report with history
-        run: |
-          docker compose run regression /bin/sh -c "allure generate allure-results --clean -o allure-report"
+        run: docker compose run regression /bin/sh -c "allure generate allure-results --clean -o allure-report"
 
+      # Шаг 8: Загружаем Allure отчет
       - name: Upload Allure Report
         uses: actions/upload-artifact@v4
         with:
           name: allure-report
           path: allure-report
 
+      # Шаг 9: Загружаем историю Allure
       - name: Upload Allure history
         uses: actions/upload-artifact@v4
         with:
@@ -54,21 +62,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Шаг 10: Клонируем основной репозиторий
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Шаг 11: Загружаем Allure отчет
       - name: Download Allure Report
         uses: actions/download-artifact@v4
         with:
           name: allure-report
           path: allure-report
 
+      # Шаг 12: Загружаем историю Allure
       - name: Download Allure history
         uses: actions/download-artifact@v4
         with:
           name: allure-history
           path: allure-report/history
 
+      # Шаг 13: Деплой отчета на GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
