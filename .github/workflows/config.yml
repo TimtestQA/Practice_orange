@@ -10,14 +10,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Копируем репозиторий gh-pages для подгрузки истории
-      - name: Checkout (copy) gh-pages repository
-        uses: actions/checkout@v2
-        with:
-          ref: gh-pages
-          path: ./.gh-pages
-
-      # Берем историю из gh-pages
+      # 1️⃣ Копируем history из gh-pages
       - name: Clone gh-pages branch for history
         run: |
           git fetch origin gh-pages --depth=1
@@ -25,21 +18,21 @@ jobs:
           git checkout origin/gh-pages -- Practice_orange/history || true
           cp -r Practice_orange/history allure-results/ || true
 
-      # Запускаем UI-тесты через Docker Compose
+      # 2️⃣ Запускаем тесты через Docker Compose
       - name: Run UI-tests via Docker Compose
         run: docker compose up --build --exit-code-from regression
 
-      # Подставляем историю в отчет перед генерацией
+      # 3️⃣ Подставляем скопированную history перед генерацией нового отчета
       - name: Copy updated history to report
         run: |
           mkdir -p allure-report/history
           cp -r allure-results/history/* allure-report/history/ || true
 
-      # Генерируем Allure-отчет с учетом истории
+      # 4️⃣ Генерируем Allure-отчет с учетом history
       - name: Generate Allure report with history
         run: docker compose run regression /bin/sh -c "allure generate allure-results --clean -o allure-report"
 
-      # Загружаем отчет и историю как артефакты
+      # 5️⃣ Загружаем новый отчет и обновленную history
       - name: Upload Allure Report
         uses: actions/upload-artifact@v4
         with:
@@ -61,7 +54,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Загружаем отчет и историю перед деплоем
+      # 6️⃣ Загружаем отчет и history перед деплоем
       - name: Download Allure Report
         uses: actions/download-artifact@v4
         with:
@@ -74,7 +67,7 @@ jobs:
           name: allure-history
           path: allure-report/history
 
-      # Деплоим отчет в gh-pages
+      # 7️⃣ Деплоим Allure-отчет в gh-pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
