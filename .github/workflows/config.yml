@@ -10,38 +10,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 1. Копируем историю из gh-pages
-      - name: Restore Allure history from gh-pages
+      - name: Clone gh-pages branch for history
         run: |
           git fetch origin gh-pages --depth=1
-          git checkout gh-pages -- Practice_orange/history || true
           mkdir -p allure-results/history
+          git checkout origin/gh-pages -- Practice_orange/history || true
           cp -r Practice_orange/history allure-results/ || true
 
-      - name: Debug Files (Before Tests)
-        run: ls -la allure-results/history || echo "No history found"
-
-      # 2. Запускаем тесты
       - name: Run UI-tests via Docker Compose
         run: docker compose up --build --exit-code-from regression
 
-      # 3. Вставляем сохраненную историю перед генерацией отчета
-      - name: Restore history before report generation
-        run: |
-          mkdir -p allure-results/history
-          cp -r Practice_orange/history allure-results/ || true
-
-      - name: Debug Files (Before Report Generation)
-        run: ls -la allure-results/history || echo "No history found"
-
-      # 4. Генерируем отчет с учетом истории
-      - name: Generate Allure report with history
+      - name: Copy updated history to report
         run: |
           mkdir -p allure-report/history
           cp -r allure-results/history allure-report/ || true
-          docker compose run regression /bin/sh -c "allure generate allure-results --clean -o allure-report"
 
-      # 5. Загружаем отчет и историю как артефакты
+      - name: Generate Allure report with history
+        run: docker compose run regression /bin/sh -c "allure generate allure-results --clean -o allure-report"
+
       - name: Upload Allure Report
         uses: actions/upload-artifact@v4
         with:
@@ -63,7 +49,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 6. Загружаем отчет и историю перед публикацией
       - name: Download Allure Report
         uses: actions/download-artifact@v4
         with:
@@ -72,12 +57,10 @@ jobs:
 
       - name: Download Allure history
         uses: actions/download-artifact@v4
-        continue-on-error: true
         with:
           name: allure-history
           path: allure-report/history
 
-      # 7. Публикуем отчет в GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
